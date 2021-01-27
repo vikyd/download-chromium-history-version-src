@@ -1,0 +1,28 @@
+{
+  "name": "download-chromium-old-version",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "core-js": "^3.6.5",
+    "debounce": "^1.2.0",
+    "fuse.js": "^6.4.6",
+    "vue": "^2.6.11",
+    "vue-gtag": "^1.10.0",
+    "vue-router": "^3.2.0",
+    "vue-select": "^3.11.2",
+    "vue-virtual-scroll-list": "^2.3.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "less": "^3.0.4",
+    "less-loader": "^5.0.0",
+    "vue-template-compiler": "^2.6.11"
+  }
+}
