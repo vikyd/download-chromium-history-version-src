@@ -10,11 +10,11 @@ JSON data: https://github.com/vikyd/chromium-history-version-position
 
 ```
 # download dependencies
-yarn install
+npm install
 
 # local
-yarn serve
+npm run serve
 
 # Compiles and minifies for production
-yarn build
+npm run build
 ```
