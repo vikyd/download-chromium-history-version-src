@@ -79,4 +79,26 @@ export const Explains = [
       },
     ],
   },
+  {
+    title: 'Resources',
+    steps: [
+      {
+        text: 'Raw JSON files',
+        href: 'https://github.com/vikyd/chromium-history-version-position',
+      },
+      {
+        text: 'Current page source code',
+        href: 'https://github.com/vikyd/download-chromium-history-version-src',
+      },
+      {
+        text: 'Crawler',
+        href: 'https://github.com/vikyd/chromium-history-version-crawler',
+      },
+      {
+        text: 'Crawler Github Actions',
+        href:
+          'https://github.com/vikyd/chromium-history-version-crawler/actions',
+      },
+    ],
+  },
 ]

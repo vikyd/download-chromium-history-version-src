@@ -99,16 +99,6 @@
           <a target="_blank" :href="item.href">{{ item.name }}</a>
         </li>
       </ul>
-      <h3>Contact:</h3>
-      <ul>
-        <li>Email: zwj_fhys@qq.com</li>
-        <li>
-          Github:
-          <a target="_blank" href="https://github.com/vikyd"
-            >github.com/vikyd</a
-          >
-        </li>
-      </ul>
     </div>
 
     <button @click="onGoTopClick" class="go-top" title="Go to top">
