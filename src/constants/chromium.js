@@ -41,7 +41,7 @@ export const Explains = [
     detail:
       'MAJOR and MINOR track updates to the Google Chrome stable channel.',
     short: 'Chromium version MAJOR.MINOR is the same as Chrome version',
-    href: 'https://www.chromium.org/developers/version-numbers',
+    href: 'https://www.chromium.org/developers/version-numbers#:~:text=MAJOR%20and%20MINOR%20track%20updates%20to%20the%20Google%20Chrome%20stable%20channel.',
   },
   {
     title: 'Version vs Position',
