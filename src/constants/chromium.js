@@ -1,6 +1,6 @@
 export const OSList = [
   { val: 'Mac', file: 'chrome-mac.zip' },
-  { val: 'Mac_Arm', file: 'chrome-mac.zip' },
+  { val: 'Mac_Arm', file: 'chrome-mac-arm.zip' },
   { val: 'Win_x64', file: 'chrome-win.zip' },
   { val: 'Win', file: 'chrome-win32.zip' },
   { val: 'Linux_x64', file: 'chrome-linux.zip' },
