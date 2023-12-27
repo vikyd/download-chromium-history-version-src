@@ -136,7 +136,7 @@ export default {
       ],
 
       // var
-      os: 'Mac',
+      os: 'Mac_Arm',
       verPosMap: {},
       verPosMapCache: {},
       verPosList: [],
