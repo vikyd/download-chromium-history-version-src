@@ -38,7 +38,7 @@
               <li>Short: {{ item.short }}</li>
             </ul>
           </span>
-          <span v-if="item.steps">
+          <span v-if="Array.isArray(item.steps) && item.steps.length">
             <ol>
               <li v-for="(s, idx) of item.steps" :key="idx">
                 <span v-if="!s.href">{{ s.text }}</span>
@@ -52,7 +52,7 @@
 
     <div class="content">
       <h3>Versions:</h3>
-      <v-select
+      <VSelect
         :options="OSList.map((item) => item.val)"
         v-model="os"
         :clearable="false"
@@ -69,25 +69,11 @@
         verseion (chromium_base_position): {{ fileName }}
       </div>
       <div class="vir-list-wrapper">
-        <!-- <virtual-list
-          class="vir-list"
-          scrollable
-          :data-key="'ver'"
-          :data-sources="verPosList"
-          :estimate-size="26"
-          :data-component="VerItem"
-        /> -->
         <div v-for="(item, index) of verPosList" :key="index" class="ver-pos">
           <a target="_blank" :href="item.href"
             >version: {{ item.ver }}
             <span class="pos">position: {{ item.pos }}</span></a
           >
-          <!-- <span style="margin-left: 15px">
-            File:
-            <a target="_blank" :href="`${item.href}${fileName}`">{{
-              fileName
-            }}</a>
-          </span> -->
         </div>
       </div>
     </div>
@@ -107,124 +93,109 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import axios from 'axios'
 import Fuse from 'fuse.js'
 import debounce from 'debounce'
-
-import VirtualList from 'vue-virtual-scroll-list'
-import VerItem from './ver-item'
+// @ts-ignore
+import VSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 
 import { OSList, Links, DownloadUrl, Explains } from '@/constants/chromium'
+import { computed, ref, watch } from 'vue'
+import { Os, VerPos, VerPosMap } from '@/model/model'
 
-export default {
-  name: 'Home',
-  components: {
-    VirtualList,
-  },
-  data() {
-    return {
-      // const
-      VerItem,
-      OSList,
-      Links,
-      Explains,
-      Points: [
-        'Official Download Link, Safe!',
-        'Official Download Speed',
-        'Most Versions',
-      ],
+const Points = [
+  'Official Download Link, Safe!',
+  'Official Download Speed',
+  'Most Versions',
+]
 
-      // var
-      os: 'Mac_Arm',
-      verPosMap: {},
-      verPosMapCache: {},
-      verPosList: [],
+const os = ref<string>('Mac_Arm')
 
-      keyword: '',
-      searchFuse: '',
-    }
-  },
-  computed: {
-    verPosListAll() {
-      return (this.verPosList = Object.keys(this.verPosMap).map((ver) => {
-        const vm = this
-        const pos = vm.verPosMap[ver]
-        return {
-          ver: ver,
-          pos: pos,
-          href: `${DownloadUrl.base}${vm.os}/${pos}/`,
-        }
-      }))
-    },
-    fileName() {
-      return this.osMap[this.os].file
-    },
-    osMap() {
-      let m = {}
-      OSList.forEach((item) => {
-        m[item.val] = item
-      })
-      return m
-    },
-  },
-  watch: {
-    os() {
-      this.keyword = ''
-      const m = this.verPosMapCache[this.os]
-      if (m) {
-        this.verPosMap = m
-        return
-      }
-      this.fetchData()
-    },
-    verPosMap() {
-      this.verPosList = this.verPosListAll
-    },
-    verPosList() {
-      this.searchFuse = new Fuse(this.verPosListAll, {
-        distance: 1000,
-        keys: ['ver', 'pos'],
-      })
-    },
-  },
-  beforeMount() {
-    this.fetchData()
-  },
-  methods: {
-    onGoTopClick() {
-      window.document.body.scrollTop = 0
-      window.document.documentElement.scrollTop = 0
-    },
-    onSearchInput: debounce(function (e) {
-      if (!this.keyword.trim()) {
-        this.verPosList = this.verPosListAll
-        return
-      }
-      const result = this.searchFuse.search(this.keyword)
-      this.verPosList = result.map((item) => item.item)
-    }, 300),
-    search() {
-      const result = this.searchFuse.search(this.keyword)
-      this.verPosList = result.map((item) => item.item)
-    },
-    async fetchData() {
-      const r = await axios.get(
-        // `https://raw.githubusercontent.com/vikyd/chromium-history-version-position/master/ver-pos-os/version-position-${this.os}.json`
-        `json/ver-pos-os/version-position-${this.os}.json`
-      )
-      this.verPosMap = r.data
-      this.verPosMapCache[this.os] = r.data
-    },
-  },
+const keyword = ref<string>('')
+
+const searchFuse = ref<Fuse<VerPos>>()
+
+const onGoTopClick = () => {
+  window.document.body.scrollTop = 0
+  window.document.documentElement.scrollTop = 0
 }
+
+const verPosMap = ref<VerPosMap>({})
+
+const verPosMapCache = ref<Record<string, VerPosMap>>({})
+
+const verPosList = ref<VerPos[]>([])
+
+const verPosListAll = computed(() => {
+  // return (this.verPosList = Object.keys(this.verPosMap).map((ver) => {
+  return Object.keys(verPosMap.value).map((ver) => {
+    const pos = verPosMap.value[ver]
+    return {
+      ver: ver,
+      pos: pos,
+      href: `${DownloadUrl.base}${os.value}/${pos}/`,
+    }
+  })
+})
+
+watch(verPosMap, () => {
+  verPosList.value = verPosListAll.value
+})
+
+watch(os, () => {
+  keyword.value = ''
+  const m = verPosMapCache.value[os.value]
+  if (m) {
+    verPosMap.value = m
+    return
+  }
+  fetchData()
+})
+
+watch(verPosList, () => {
+  searchFuse.value = new Fuse(verPosListAll.value, {
+    distance: 1000,
+    keys: ['ver', 'pos'],
+  })
+})
+
+const osMap = computed(() => {
+  return OSList.reduce((map, x) => {
+    map[x.val] = x
+    return map
+  }, {} as Record<string, Os>)
+})
+
+const fileName = computed(() => {
+  return osMap.value[os.value].file
+})
+
+const onSearchInput = debounce(function () {
+  if (!keyword.value.trim() || !searchFuse.value) {
+    verPosList.value = verPosListAll.value
+    return
+  }
+  const result = searchFuse.value.search(keyword.value)
+  verPosList.value = result.map((item) => item.item)
+}, 300)
+
+const fetchData = async () => {
+  const r = await axios.get<VerPosMap>(
+    `json/ver-pos-os/version-position-${os.value}.json`
+  )
+  verPosMap.value = r.data
+  verPosMapCache.value[os.value] = r.data
+}
+
+fetchData()
 </script>
 <style lang="less" scoped>
 .home {
   display: flex;
 
   flex-direction: column;
-  // align-items: stretch;
 
   margin: 10px 30px;
 }
@@ -239,18 +210,10 @@ export default {
   height: 104px;
 }
 
-.header {
-  // margin-bottom: 10px;
-}
-
 .header-title {
   display: flex;
   flex-direction: row;
   align-items: center;
-}
-
-.content {
-  // height: 100%;
 }
 
 .footer {
@@ -258,20 +221,10 @@ export default {
 }
 
 .vir-list-wrapper {
-  // align-self: stretch;
-  // flex: 200px 1 0;
   margin-bottom: 30px;
   padding: 5px;
   border: 1px solid #ddd;
   width: 400px;
-  // max-height: 800px;
-  // overflow: scroll;
-}
-
-.vir-list {
-  height: 500px;
-  // height: 100%;
-  overflow-y: auto;
 }
 
 .control-row {
@@ -281,11 +234,10 @@ export default {
 }
 
 .os-list {
-  // display: inline-block;
   width: 412px;
   margin-bottom: 10px;
 
-  ::v-deep > div {
+  :deep(> div) {
     border: 1px solid #ddd;
     border-radius: 0;
   }
@@ -325,7 +277,6 @@ export default {
 }
 
 .pos {
-  // padding-left: 10px;
   position: absolute;
   left: 200px;
 }

@@ -10,11 +10,11 @@ JSON data: https://github.com/vikyd/chromium-history-version-position
 
 ```
 # download dependencies
-npm install
+pnpm install
 
 # local
-npm run serve
+pnpm dev
 
 # Compiles and minifies for production
-npm run build
+pnpm build
 ```
